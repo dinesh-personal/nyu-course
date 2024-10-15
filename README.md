@@ -26,3 +26,13 @@ Next, install the required packages:
 ```
 $ pip install -r requirements.txt
 ```
+
+## Execution 
+After installation, you can open a terminal on your machine and start jupyter notebook in the demos directory
+
+```
+$ jupyter notebook
+```
+
+This should open the jupyter notebook in a browser and you can brosw and run the selected notebooks. 
+
