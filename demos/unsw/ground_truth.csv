@@ -1,0 +1,20 @@
+﻿DeviceName,mac,SrcIPAddress,Vendor,Model
+Smart Things,d0:52:a8:00:67:5e,192.168.1.196,Samsung,Smart Things
+Amazon Echo,44:65:0d:56:cc:d3,192.168.1.240,Amazon,Amazon Echo
+Netatmo Welcome,70:ee:50:18:34:43,192.168.1.241,Netatmo,Netatmo Welcome
+TP-Link Day Night Cloud camera,f4:f2:6d:93:51:f1,192.168.1.143,TP-Link,TP-Link Day Night Cloud camera
+Samsung SmartCam,00:16:6c:ab:6b:88,192.168.1.249,Samsung,Samsung SmartCam
+Dropcam,30:8c:fb:2f:e4:b2,192.168.1.106,Google,Dropcam
+Withings Smart Baby Monitor,00:24:e4:11:18:a8,192.168.1.166,Withings,Withings Smart Baby Monitor
+TP-Link Smart plug,50:c7:bf:00:56:39,192.168.1.227,TP-Link,TP-Link Smart plug
+NEST Protect smoke alarm,18:b4:30:25:be:e4,192.168.1.168,Google,NEST Protect smoke alarm
+Netatmo weather station,70:ee:50:03:b8:ac,192.168.1.112,Netatmo,Netatmo weather station
+Withings Smart scale,00:24:e4:1b:6f:96,192.168.1.238,Withings,Withings Smart scale
+Blipcare Blood Pressure meter,74:6a:89:00:2e:25,192.168.1.131,Blipcare,Blipcare Blood Pressure meter
+Triby Speaker,18:b7:9e:02:20:44,192.168.1.120,Triby,Triby Speaker
+PIX-STAR Photo-frame,e0:76:d0:33:bb:85,192.168.1.177,PixStar,PIX-STAR Photo-frame
+HP Printer,70:5a:0f:e4:9b:c0,192.168.1.236,HP,HP Printer
+Samsung Galaxy Tab,08:21:ef:3b:fc:e3,192.168.1.239,Samsung,Samsung Galaxy Tab
+Laptop,74:2f:68:81:69:42,192.168.1.208,Laptop,Laptop
+Android Phone,b4:ce:f6:a7:a3:c2,192.168.1.248,Phone,Phone
+IPhone,d0:a6:37:df:a1:e1,192.168.1.228,Apple,iPhone
