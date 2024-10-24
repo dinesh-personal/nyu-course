@@ -143,7 +143,7 @@ def plot_multi_bar(df, selector_col, x_col, marker_col, figsize):
     plt.show()    
 
 def determine_feature_importance(X, Y,feature_names):
-    myfunctions = [('PreProcess', skp.MinMaxScaler()), ('Classifier', RandomForestClassifier() )]
+    myfunctions = [('PreProcess', skp.MaxAbsScaler()), ('Classifier', RandomForestClassifier() )]
     pipeline = Pipeline(myfunctions)
     pipeline.fit(X, Y)
     classifier = pipeline['Classifier']
@@ -155,6 +155,7 @@ def determine_feature_importance(X, Y,feature_names):
 def add_column(df, map_dict, field_name, orig_column, default_value):
     def get_new_value(x):
         return map_dict.get(x,default_value)
+    df = df.copy()
     df[field_name] = df[orig_column].apply(get_new_value)
     return df
 
@@ -186,4 +187,111 @@ def plot_pca_map(df, features_column, color_column):
     pca_X = pca.fit_transform(scaled_X)
     pca_df = pd.DataFrame({'PCA_1':pca_X[:,0], 'PCA_2': pca_X[:,1], color_column:Y})
     plot_df(pca_df, 'PCA_1', 'PCA_2', color_column)
+
+
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn import tree
+from sklearn.tree import _tree
+
+def get_tree(df,features,Y_col,max_depth):
+    X = df[features].to_numpy()
+    Y = df[Y_col].to_list()
+    ''' Constraining the tree to maximum depth and also less than 2^features leaf nodes for compact trees'''
+    myfunctions = [('PreProcess', skp.MinMaxScaler()), ('Classifier', DecisionTreeClassifier(max_depth=max_depth,max_leaf_nodes=2**X.shape[1] ) )]
+    pipeline = Pipeline(myfunctions)
+    pipeline.fit(X, Y)
+    classifier = pipeline['Classifier']
+    return classifier
+
+def print_rules(classifier,features):
+    text_representation = tree.export_text(classifier,feature_names=features)
+    print(text_representation)
+
+NAME = 'name'
+OP = 'op'
+VALUE = 'value'
+
+def consolidate(path:list):
+    subset = path[0:-1]
+    queries = [x[NAME] for x in subset]
+    term_list = list(set(queries))
+    answer = list()
+    for term in term_list:
+        matches = [x for x in subset if x[NAME]==term]
+        lower_limit = min([x[VALUE] for x in matches if '<=' == x[OP]] + [10])
+        upper_limit = max([x[VALUE] for x in matches if '>' == x[OP]] + [-10])
+        if 10 == lower_limit and -10 == upper_limit:
+            continue 
+        elif 10 == lower_limit: 
+            answer.append(f'{term} > {upper_limit}')
+        elif -10 == upper_limit:
+            answer.append(f'{term} <= {lower_limit}')
+        else:
+            answer.append(f'{lower_limit} <= {term} < {upper_limit}')
+    return answer + [path[-1]]
+
+def get_rules(tree, feature_names, class_names):
+    tree_ = tree.tree_
+    feature_name = [
+        feature_names[i] if i != _tree.TREE_UNDEFINED else "undefined!"
+        for i in tree_.feature
+    ]
+
+    paths = []
+    path = []
+    
+    def recurse(node, path, paths):
+        
+        if tree_.feature[node] != _tree.TREE_UNDEFINED:
+            name = feature_name[node]
+            threshold = tree_.threshold[node]
+            p1, p2 = list(path), list(path)
+            p1 += [{ NAME:name, OP:'<=', VALUE: np.round(threshold,2)}]
+            recurse(tree_.children_left[node], p1, paths)
+            p2 += [{ NAME:name, OP:'>', VALUE: np.round(threshold,2)}]
+            recurse(tree_.children_right[node], p2, paths)
+        else:
+            path += [(tree_.value[node], tree_.n_node_samples[node])]
+            paths += [path]
+            
+    recurse(0, path, paths)
+
+    # sort by samples count
+    samples_count = [p[-1][1] for p in paths]
+    ii = list(np.argsort(samples_count))
+    paths = [paths[i] for i in reversed(ii)]
+    
+    rules = []
+
+    for path in paths:
+        npath = consolidate(path)
+        rule = "if "
+        
+        for p in npath[:-1]:
+            if rule != "if ":
+                rule += " and "
+            rule += p
+        rule += " then "
+        if class_names is None:
+            rule += "response: "+str(np.round(path[-1][0][0][0],3))
+        else:
+            classes = path[-1][0][0]
+            l = np.argmax(classes)
+            rule += f"class: {class_names[l]} (proba: {np.round(100.0*classes[l]/np.sum(classes),2)}%)"
+        rule += f" | based on {path[-1][1]:,} samples"
+        rules += [rule]
+        
+    return rules
+
+'''
+Note: this only works for numeric features.
+'''
+def print_tree_rules(df, features,Y_col,max_depth=10):
+    this_tree=get_tree(df,features,Y_col,max_depth=max_depth)
+    print('One way to View the Tree:')
+    print_rules(this_tree,features)
+    print('----- Alternate View----')
+    rules = get_rules(this_tree,features,this_tree.classes_)
+    for this_rule in rules:
+        print(this_rule)
     

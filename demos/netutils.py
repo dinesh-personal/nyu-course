@@ -195,3 +195,4 @@ def add_hour(df, field_name='Hour', local_prefix=None):
     if local_prefix is not None:
         df = df[df[SRC_IP].str.startswith(local_prefix)]
     return df
+
